@@ -109,7 +109,7 @@ There are two alternatives detailed below.
 This approach configures Ela as a jump host and creates aliases for the systems that you want to access in `~/.ssh/config` on your laptop or PC.
 The benefit of this approach is that once the `~/.ssh/config` file has been configured, no additional steps are required between creating a new key using MFA, and logging in.
 
-Below is an example `~./.ssh/config` file that facilitates directly logging into the Daint, Santis and Clariden clusters using `ela.cscs.ch` as a Jump host:
+Below is an example `~/.ssh/config` file that facilitates directly logging into the Daint, Santis and Clariden clusters using `ela.cscs.ch` as a Jump host:
 
 ```
 Host ela
