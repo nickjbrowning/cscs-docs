@@ -196,9 +196,10 @@ To view all uenv that have been pulled, and are ready to use use the `uenv image
 
 By default, uenv can be pulled by all users on a system, with no restrictions.
 
-Some uenv are not available to all users, for exampl the vasp  images are only available for users who have a VASP license, who are added to the vasp6  group once then have provided CSCS with a copy of their license.
+Some uenv are not available to all users, for example the `vasp` images are only available for users with a VASP license, who are added to the `vasp` group once then have provided CSCS with a copy of their license.
 
-To be able to pull such images, you first need to configure the token for that specific software. This step only needs to be performed once - once set up you will only need to perform it again if the token is changed, or if you need to use a different token for another uenv.
+To be able to pull such images a token that authorizes access must be provided.
+Tokens are created by CSCS, and stored on SCRATCH in a file that only users who have access to the software can read.
 
 !!! example  "using a token to access VASP"
     ```terminal
@@ -210,6 +211,9 @@ To be able to pull such images, you first need to configure the token for that s
 
 !!! note
     As of March 2025, the only restricted software is VASP.
+
+!!! note
+    Better token management is under development - tokens will be stored in a central location and be easier to use.
 
 [](){#ref-tool-uenv-start}
 ## Starting a uenv session
