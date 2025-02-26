@@ -13,7 +13,7 @@ We recommend to use a smartphone with an application such as Google Authenticato
 [](){#ref-mfa-setup}
 ## Getting Started
 
-When you first log in to any of the CSCS web applications such as UMP, Jupyter, etc., you will be asked to register your device.
+When you first log in to any of the CSCS web applications such as UMP, Jupyter, etc., you will be asked to register your device (typically your phone).
 
 Firstly, you will be asked to provide a code that you received by email.
 After this validation step, you will need to scan a QR code with your mobile phone using an application such as Google Authenticator.
