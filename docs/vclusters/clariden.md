@@ -1,89 +1,153 @@
 [](){#ref-cluster-clariden}
 # Clariden
 
-!!! todo
-    Introduction
-
-    This page is a cut and paste of some of Todi's old documentation, which we can turn into a template.
+Clariden is an Alps cluster that provides GPU accelerators and file systems designed to meet the needs of machine learning workloads in the [MLP][ref-platform-mlp].
 
 ## Cluster Specification
-### Hardware
-Clariden consists of ~1200 [Grace-Hopper nodes][ref-alps-gh200-node]. Most nodes are in the [`normal` slurm partition][ref-slurm-partition-normal], while a few nodes are in the [`debug` partition][ref-slurm-partition-debug].
 
+### Compute Nodes
 
+Clariden consists of around 1200 [Grace-Hopper nodes][ref-alps-gh200-node].
+The number of nodes can change when nodes are added or removed from other clusters on Alps.
 
-!!! todo
-    a standardised table with information about
+| node type | number of nodes | total CPU sockets | total GPUs |
+|-----------|--------| ----------------- | ---------- |
+| [gh200][ref-alps-gh200-node] | 1,200 | 4,800 | 4,800 |
 
-    * number and type of nodes
+Most nodes are in the [`normal` slurm partition][ref-slurm-partition-normal], while a few nodes are in the [`debug` partition][ref-slurm-partition-debug].
 
-    and any special notes
+### File Systems and Storage
 
-## Logging into Clariden
+There are three main file systems mounted on Clariden and Bristen.
 
-!!! todo
-    how to log in, i.e. `ssh clariden.cscs.ch` via `ela.cscs.ch`
+| type |mount | filesystem |
+| -- | -- | -- |
+| Home | /users/$USER | [VAST][ref-alps-vast] |
+| Scratch | `/iopstor/scratch/cscs/$USER` | [Iopstor][ref-alps-iopstor] |
+| Project | `/capstor/store/cscs/swissai/<project>` | [Capstor][ref-alps-capstor] |
 
-    provide the snippet to add to your `~/.ssh/config`, and link to where we document this (docs not currently available)
+#### Home
 
-## Software and services
+Every user has a home path (`$HOME`) mounted at `/users/$USER` on the [VAST][ref-alps-vast] filesystem.
+The home directory has 50 GB of capacity, and is intended for configuration, small software packages and scripts.
 
-!!! todo
-    information about CSCS services/tools available
+#### Scratch
 
-    * container engine
-    * uenv
-    * CPE
-    * ... etc
+Scratch filesystems provide temporary storage for high-performance I/O for executing jobs.
+Use scratch to store datasets that will be accessed by jobs, and for job output.
+Scratch is per user - each user gets separate scratch path and quota.
+
+* The environment variable `SCRATCH=/iopstor/scratch/cscs/$USER` is set automatically when you log into the system, and can be used as a shortcut to access scratch.
+
+!!! warning "scratch cleanup policy"
+    Files that have not been accessed in 30 days are automatically deleted.
+
+    **Scratch is not intended for permanant storage**: transfer files back to the capstor project storage after job runs.
+
+!!! note
+    There is an additional scratch path mounted on [Capstor][ref-alps-capstor] at `/capstor/scratch/cscs/$USER`, however this is not reccomended for ML workloads for performance reasons.
+
+### Project
+
+Project storage is backed up, with no cleaning policy: it provides intermediate storage space for datasets, shared code or configuration scripts that need to be accessed from different vClusters.
+Project is per project - each project gets a project folder with project-specific quota.
+
+* if you need additional storage, ask your PI to contact the CSCS service managers Fawzi or Nicholas.
+* hard limits on capacity and inodes prevent users from writing to project if the quota is reached - you can check quota and available space by running the [`quota`][ref-storage-quota] command on a login node or ela 
+* it is not recommended to write directly to the project path from jobs.
+
+## Getting started
+
+### Logging into Clariden
+
+To connect to Clariden via SSH, first refer to the [ssh guide][ref-ssh].
+
+!!! example "`~/.ssh/config`"
+    Add the following to your [SSH configuration][ref-ssh-config] to enable you to directly connect to clariden using `ssh clariden`.
+    ```
+    Host clariden
+        HostName clariden.alps.cscs.ch
+        ProxyJump ela
+        User cscsusername
+        IdentityFile ~/.ssh/cscs-key
+        IdentitiesOnly yes
+    ```
+### Software
+
+Users are encouraged to use containers on Clariden.
+
+* Jobs using containers can be easily set up and submitted using the [container engine][ref-container-engine].
+* To build images, see the [guide to building container images on Alps][ref-build-containers].
+
+Alternatively, [uenv][ref-tool-uenv] are also available on Clariden. Currently the only uenv that is deployed on Clariden is [prgenv-gnu][ref-uenv-prgenv-gnu].
+
+??? example "using uenv provided for other clusters"
+    You can run uenv that were built for other Alps clusters using the `@` notation.
+    For example, to use uenv images for [daint][ref-cluster-daint]:
+    ```bash
+    # list all images available for daint
+    uenv image find @daint
+
+    # download an image for daint
+    uenv image pull namd/3.0:v3@daint
+
+    # start the uenv
+    uenv start namd/3.0:v3@daint
+    ```
 
 ## Running Jobs on Clariden
 
-Clariden uses [SLURM][slurm] as the workload manager, which is used to launch and monitor distributed workloads, such as training runs.
+### SLURM
 
-See detailed instructions on how to run jobs on the [Grace-Hopper nodes][ref-slurm-gh200].
+Clariden uses [SLURM][ref-slurm] as the workload manager, which is used to launch and monitor distributed workloads, such as training runs.
 
-## Storage
+There are two slurm partitions on the system:
 
-!!! todo
-    describe the file systems that are attached, and where.
+* the `normal` partition is for all production workloads.
+* the `debug` partition can be used to access a small allocation for up to 30 minutes for debugging and testing purposes.
+* the `xfer` partition is for [internal data transfer][ref-data-xfer-internal] at CSCS.
 
-    This is where `$SCRATCH`, `$PROJECT` etc are defined for this cluster.
+| name | nodes  | max nodes per job | time limit |
+| --   | --     | --                | -- |
+| `normal` | 1266       | -    | 24 hours |
+| `debug`  | 32         | 2    | 30 minutes |
+| `xfer`   | 2          | 1    | 24 hours |
 
-    Refer to the specific file systems that these map onto (capstor, iopstor, waldur), and link to the storage docs for these.
+* nodes in the `normal` and `debug` partitions are not shared
+* nodes in the `xfer` partition can be shared
 
-    Also discuss any specific storage policies. You might want to discuss storage policies for MLp one level up, in the [MLp docs][ref-platform-mlp].
+See the SLURM documentation for instructions on how to run jobs on the [Grace-Hopper nodes][ref-slurm-gh200].
 
-* attached storage and policies
+??? example "how to check the number of nodes on the system"
+    You can check the size of the system by running the following command in the terminal:
+    ```terminal
+    > sinfo --format "| %20R | %10D | %10s | %10l | %10A |"
+    | PARTITION            | NODES      | JOB_SIZE   | TIMELIMIT  | NODES(A/I) |
+    | debug                | 32         | 1-2        | 30:00      | 3/29       |
+    | normal               | 1266       | 1-infinite | 1-00:00:00 | 812/371    |
+    | xfer                 | 2          | 1          | 1-00:00:00 | 1/1        |
+    ```
+    The last column shows the number of nodes that have been allocted in currently running jobs (`A`) and the number of jobs that are idle (`I`).
 
-## Calendar and key events
+### FirecREST
 
-The system is updated every Tuesday, between 9 am and 12 pm.
-...
+Clariden can also be accessed using [FircREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
 
-!!!todo
-    notifications
-    
-    a calendar widget would be useful, particularly if we can have a central calendar, and a way to filter events for specific instances
+## Maintenance and status
 
-## Change log
+### Scheduled Maintenance
 
-!!! change "special text boxes for updates"
-    they can be opened and closed.
+Wednesday morning 8-12 CET is reserved for periodic updates, with services potentially unavailable during this timeframe. If the queues must be drained (redeployment of node images, rebooting of compute nodes, etc) then a Slurm reservation will be in place that will prevent jobs from running into the maintenance window. 
 
-!!! change "2024-10-15 reservation `daint` available again"
-    The reservation daint  is available again exclusively for Daint users that need to run their benchmarks for submitting their proposals, additionally to the debug  partition and free nodes.
-    Please add the Slurm option --reservation=daint to your batch script if you want to use it
+Exceptional and non-disruptive updates may happen outside this time frame and will be announced to the users mailing list, and on the [CSCS status page](https://status.cscs.ch).
 
-??? change "2024-10-07 New compute node image deployed"
-    New compute node image deployed to fix the issue with GPU-aware MPI.
+### Change log
 
-    Max job time limit is decreased from 12 hours to 6 hours
+!!! change "2025-03-05 container engine updated"
+    now supports better containers that go faster. Users do not to change their workflow to take advantage of these updates.
 
-??? change "2024-09-18 Daint users"
-    In order to complete the preparatory work necessary to deliver Alps in production, as of September 18 2024 the vCluster Daint on Alps will no longer be accessible until further notice: the early access will still be granted on Tödi using the Slurm reservation option `--reservation=daint`
+??? change "2024-10-07 old event"
+    this is an old update. Use `???` to automatically fold the update.
 
-## Known issues
+### Known issues
 
-__TODO__ list of know issues - include links to known issues page
-
-[CSCS Service Desk]: https://jira.cscs.ch/plugins/servlet/desk

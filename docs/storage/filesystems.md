@@ -6,21 +6,57 @@
 
 CSCS supports different file systems, whose specifications are summarized in the table below:
 
-|          | `$SCRATCH` | `$PROJECT` | `$STORE` | `$HOME` | `$PROJECT_ID` | `$SCRATCH_ID` | `$STORE_ID` |
-|----------|-----------|-----------|----------|--------|--------------|--------------|------------|
-| Access Speed | Fast | Fast | Fast | Slow | Fast | Medium | Slow |
-| Capacity | 8.8 PB | 91 PB | 1.9 PB | 160 TB | 91 PB | 6.0 PB | 7.6 PB |
-| Data Backup | None | None | None | 90 days | 90 days | 90 days | 90 days |
-| Expiration | 30 days | 30 days | 30 days | Account closure | End of the project/contract | End of the project | End of the contract |
-| Quota | Soft (1M files) | Soft (150 TB and 1M files) | None | 50GB/user and 500k files | 150 TB and 1M files | Maximum 50k files/TB | Maximum 50k files/TB |
-| Type | Lustre | Lustre | GPFS | GPFS | Lustre | GPFS | GPFS |
-
-To check your usage, please type the command `quota` on the front end Ela.
 
 Please build big software projects not fitting `$HOME` on `$PROJECT` instead.
 Since you should not run jobs from `$HOME` or `$PROJECT`, please copy the executables, libraries and data sets needed to run your simulations to `$SCRATCH` with the Slurm transfer queue.
 
 Users can also write temporary builds on `/dev/shm`, a filesystem using virtual memory rather than a persistent storage device: please note that files older than 24 hours will be deleted automatically.
+
+[](){#ref-storage-quota}
+## Quota
+
+You can check your storage quotas with the command quota on the front-end system ela (ela.cscs.ch) and the login nodes of [eiger][ref-cluster-eiger], [daint][ref-cluster-daint], [santis][ref-cluster-santis], and [clariden][ref-cluster-clariden].
+
+```bash
+$ quota
+Retrieving data ...
+
+User: testuser
+Usage data updated on: 2025-02-21 16:01:27
++------------------------------------+--------+-----+-------+----+-------------+----------+-----+---------+------+-------------+
+|                                    |  User quota  | Proj quota |             |   User files   |   Proj files   |             |
++------------------------------------+--------+-----+-------+----+-------------+----------+-----+---------+------+-------------+
+| Directory                          |   Used |   % |  Used |  % | Quota limit |     Used |   % |    Used |    % | Files limit |
++------------------------------------+--------+-----+-------+----+-------------+----------+-----+---------+------+-------------+
+| /iopsstor/scratch/cscs/testuser    |   4.0K |   - |     - |  - |           - |        1 |   - |       - |    - |           - |
+| /capstor/scratch/cscs/testuser     |   8.0K | 0.0 |     - |  - |      150.0T |        2 | 0.0 |       - |    - |     1000000 |
+| /users/testuser                    |  32.0K | 0.0 |     - |  - |       50.0G |       42 | 0.0 |       - |    - |      500000 |
++------------------------------------+--------+-----+-------+----+-------------+----------+-----+---------+------+-------------+
+```
+
+Quotas apply to the total size of stored data, and in some cases to the number of [inodes](https://en.wikipedia.org/wiki/Inode), to the filesystems on Alps.
+The command reports both disk space and the number of files for each filesystem/directory.
+
+??? note "what is an inode"
+    inodes are data structures that describe Linux file system objects like files and directories - every file and directory has a corresponding inode.
+
+    Large inode counts degrade file system performance in multiple ways.
+    For example, Lustre filesystems have separate metadata and data management.
+    Excessive inode usage can overwhelm the metadata servces, causing degradation across the filesystem.
+
+    !!! tip
+        Consider archiving folders with the tar command in order to keep low the number of files owned by users and groups.
+
+    !!! tip
+        Consider compressing directories full of many small input files as squashfs images - which pack many files into a single file that can be mounted to access the contents efficiently.
+
+!!! note
+    The size of the quota depends on the file system, platform and project.
+
+[](){#ref-storage-cleaning}
+
+## Cleaning Policy and Data Retention
+
 
 ## Scratch
 
