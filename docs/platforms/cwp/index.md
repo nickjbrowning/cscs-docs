@@ -1,7 +1,7 @@
 [](){#ref-platform-cwp}
 # Climate and weather platform
 
-The Machine Learning Platform (MLp) provides compute, storage and support to the climate and weather modeling community in Switzerland.
+The Climate and Weather Platform (CWP) provides compute, storage and support to the climate and weather modeling community in Switzerland.
 
 ## Getting Started
 
