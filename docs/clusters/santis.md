@@ -1,25 +1,29 @@
 [](){#ref-cluster-santis}
 # Santis
 
-Santis is an Alps cluster that provides GPU accelerators and file systems designed to meet the needs of climate and weather models for the [CWp][ref-platform-cwp].
+Santis is an Alps cluster that provides GPU accelerators and file systems designed to meet the needs of climate and weather models for the [CWP][ref-platform-cwp].
 
 ## Cluster specification
 
 ### Compute nodes
 
-Santis consists of around ??? [Grace-Hopper nodes][ref-alps-gh200-node].
+Santis consists of around 600 [Grace-Hopper nodes][ref-alps-gh200-node].
+
+!!! note
+    In late March 2025 Santis was temporarily expanded to 1233 nodes for [Gordon Bell and HPL runs][ref-gb2025].
+
 The number of nodes can change when nodes are added or removed from other clusters on Alps.
 
 There are four login nodes, labelled `santis-ln00[1-4]`.
 You will be assigned to one of the four login nodes when you ssh onto the system, from where you can edit files, compile applications and start simulation jobs.
 
 | node type | number of nodes | total CPU sockets | total GPUs |
-|-----------|--------| ----------------- | ---------- |
-| [gh200][ref-alps-gh200-node] | 1,200 | 4,800 | 4,800 |
+|-----------|-----------------| ----------------- | ---------- |
+| [gh200][ref-alps-gh200-node] | 600 | 2,400      | 2,400 |
 
 ### Storage and file systems
 
-Santis uses the [CWp filesystems and storage policies][ref-cwp-storage].
+Santis uses the [CWP filesystems and storage policies][ref-cwp-storage].
 
 ## Getting started
 
