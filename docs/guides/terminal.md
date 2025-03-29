@@ -69,8 +69,7 @@ export XDG_STATE_HOME=$xdgbase/state
 # set PATH to look for in architecture specific path:
 # - on x86: $HOME/.local/x86_64/bin
 # - on ARM: $HOME/.local/aarch64/bin
-export ARCHPATH=$xdgbase/bin
-export PATH=$ARCHPATH:$PATH
+export PATH=$xdgbase/bin:$PATH
 ```
 
 !!! note "XDG what?"
