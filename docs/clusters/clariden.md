@@ -79,7 +79,7 @@ There are two slurm partitions on the system:
 
 * nodes in the `normal` and `debug` partitions are not shared
 * nodes in the `xfer` partition can be shared
-* nodes in the `debug` queue have a 1.5 node-hour time limit. This means you could request 2 nodes for 45 minutes each, or 1 single node for the full time limit.
+* nodes in the `debug` queue have a 1.5 node-hour time limit. This means you could for example request 2 nodes for 45 minutes each, or 1 single node for the full time limit.
 
 See the SLURM documentation for instructions on how to run jobs on the [Grace-Hopper nodes][ref-slurm-gh200].
 
@@ -96,7 +96,7 @@ See the SLURM documentation for instructions on how to run jobs on the [Grace-Ho
 
 ### FirecREST
 
-Clariden can also be accessed using [FircREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v2` API endpoint.
+Clariden can also be accessed using [FircREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
 
 ## Maintenance and status
 
