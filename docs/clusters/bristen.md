@@ -53,6 +53,10 @@ There is currently a single slurm partition on the system:
 * the `normal` partition is for all production workloads.
     + nodes in this partition are not shared.
 
+| name | nodes  | max nodes per job | time limit |
+| --   | --     | --                | -- |
+| `normal` | 32       | -    | 24 hours |
+
 <!--
 See the SLURM documentation for instructions on how to run jobs on the [Grace-Hopper nodes][ref-slurm-gh200].
 
