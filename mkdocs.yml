@@ -78,6 +78,7 @@ nav:
       - 'NVIDIA Nsight': software/devtools/nvidia-nsight.md
     - 'uenv': software/uenv.md
     - 'Container Engine': software/container-engine.md
+    - 'Unsupported Software': software/unsupported.md
   - 'Services':
     - services/index.md
     - 'FirecREST': services/firecrest.md
