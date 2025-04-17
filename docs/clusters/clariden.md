@@ -42,8 +42,14 @@ Users are encouraged to use containers on Clariden.
 
 * Jobs using containers can be easily set up and submitted using the [container engine][ref-container-engine].
 * To build images, see the [guide to building container images on Alps][ref-build-containers].
+* Base images which include the necessary libraries and compilers are for example available from the [Nvidia NGC Catalog](https://catalog.ngc.nvidia.com/containers):
+    * [HPC NGC container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/nvhpc)
+    * [PyTorch NGC container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
 
-Alternatively, [uenv][ref-uenv] are also available on Clariden. Currently the only uenv that is deployed on Clariden is [prgenv-gnu][ref-uenv-prgenv-gnu].
+Alternatively, [uenv][ref-uenv] are also available on Clariden. Currently deployed on Clariden:
+
+* [prgenv-gnu][ref-uenv-prgenv-gnu]
+* [pytorch][ref-uenv-pytorch]
 
 ??? example "using uenv provided for other clusters"
     You can run uenv that were built for other Alps clusters using the `@` notation.
