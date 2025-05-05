@@ -58,7 +58,7 @@ To build a container with Podman, we need to request a shell on a compute node f
 # ... more output here ...
 ```
 
-where you should replace `<ACCOOUNT>` with your project account ID. At this point, you can exit the SLURM allocation by typing `exit`. You should be able to see a new squashfile next to your Dockerfile:
+where you should replace `<ACCOUNT>` with your project account ID. At this point, you can exit the SLURM allocation by typing `exit`. You should be able to see a new squashfile next to your Dockerfile:
 
 ```
 [cluster][user@cluster-ln001 pytorch-24.01-py3-venv]$ ls
