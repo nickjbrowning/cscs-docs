@@ -100,7 +100,7 @@ nav:
     - 'Internet Access on Alps': guides/internet-access.md
     - 'Storage': guides/storage.md
     - 'Using the terminal': guides/terminal.md
-    - 'MLP Tutorials'
+    - 'MLP Tutorials':
       - guides/mlp_tutorials.md
       - 'LLM Finetuning': guides/mlp_tutorials/llm-finetuning.md
       - 'LLM Inference': guides/mlp_tutorials/llm-inference.md
