@@ -14,16 +14,6 @@ The model we will be running is Google's [Gemma-7B](https://huggingface.co/googl
 
 This tutorial assumes you are able to access the cluster via SSH. To set up access to CSCS systems, follow the guide [here][ref-ssh], and read through the documentation about the [ML Platform][ref-platform-mlp].
 
-###  Set up Permissions for the Nvidia NGC Catalog
-
-Some [Nvidia NGC](https://www.nvidia.com/en-us/gpu-cloud) containers can only be downloaded with a valid API token, so we need to set one up. Create an account and setup your API token in the [Nvidia NGC container catalog](https://catalog.ngc.nvidia.com). Then, use your favorite text editor to create a credentials file `~/.config/enroot/.credentials` for enroot. Enroot will be responsible for fetching the container image from NGC behind the scenes. The credentials file should look like this:
-
-```
-machine nvcr.io login $oauthtoken password <API-TOKEN>
-```
-
-Make sure to replace `<API-TOKEN>` with your actual token.
-
 ### Modify the NGC Container
 
 In theory, we could now just go ahead and use the container to run some PyTorch code. However, chances are that we will need some additional libraries or software. For this reason, we need to use some docker commands to build a container on top of what is provided by Nvidia. To do this, we create a new directory for building containers in our home directory and set up a [Dockerfile](https://docs.docker.com/reference/dockerfile/):
