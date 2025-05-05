@@ -35,7 +35,7 @@ In theory, we could now just go ahead and use the container to run some PyTorch 
 
 Use your favorite text editor to create a file `Dockerfile` here. The Dockerfile should look like this:
 
-```
+```dockerfile title="Dockerfile"
 FROM nvcr.io/nvidia/pytorch:24.01-py3
 
 ENV DEBIAN_FRONTEND=noninteractive
