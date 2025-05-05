@@ -14,12 +14,11 @@ This tutorial assumes you've already successfully completed the [LLM Inference][
 
 We will use HuggingFace TRL to fine-tune Gemma-7B on the [OpenAssistant dataset](https://huggingface.co/datasets/OpenAssistant/oasst_top1_2023-08-25). First, we need to update our Python environment with some extra libraries to support TRL. To do this, we can launch an interactive shell in the PyTorch container, just like we did in the previous tutorial. Then, we install `peft`:
 
-```
-[cluster][user@cluster-ln001 gemma-inference]$ cd $SCRATCH/gemma-inference
-[cluster][user@cluster-ln001 gemma-inference]$ srun --environment=gemma-pytorch --container-workdir=$PWD --pty bash
-user@nid001234:/bret/scratch/cscs/user/gemma-inference$ source ./gemma-venv/bin/activate
-(gemma-venv) user@nid001234:/bret/scratch/cscs/user/gemma-inference$ python -m pip install peft==0.11.1
-# ... pip output ...
+```bash
+cd $SCRATCH/gemma-inference
+srun --environment=gemma-pytorch --container-workdir=$PWD --pty bash
+source ./gemma-venv/bin/activate
+python -m pip install peft==0.11.1
 ```
 
 Next, we also need to clone and install the `trl` Git repository so that we have access to the fine-tuning scripts in it. For this purpose, we will install the package in editable mode in the virtual environment. This makes it available in python scripts independent of the current working directory and without creating a redundant copy of the files.
