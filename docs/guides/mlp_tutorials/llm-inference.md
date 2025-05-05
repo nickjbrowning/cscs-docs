@@ -137,7 +137,7 @@ At this point, you can exit the SLURM allocation again by typing `exit`. If you 
 
 Cool, now you have a working container with PyTorch and all the necessary Python packages installed! Let's move on to Gemma-7B.  We write a Python script `$SCRATCH/gemma-inference/gemma-inference.py` to load the model and prompt it with some custom text. The Python script should look like this:
 
-```
+```python title="$SCRATCH/gemma-inference/gemma-inference.py"
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
