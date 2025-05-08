@@ -2,7 +2,8 @@
 
 # LLM Nanotron Training Tutorial
 
-In this tutorial, we will build a container image to run nanotron training jobs. We will train a 109M parameter model with ~100M wikitext tokens as a proof of concept.
+In this tutorial, we will build a container image to run nanotron training jobs.
+We will train a 109M parameter model with ~100M wikitext tokens as a proof of concept.
 
 ### Prequisites 
 
@@ -12,7 +13,7 @@ It is also recommended to follow the previous tutorials: [LLM Inference][ref-mlp
 
 Edit your `$HOME/.config/containers/storage.conf` according to the following minimal template:
 
-```title="$HOME/.config/containers/storage.conf"
+```toml title="$HOME/.config/containers/storage.conf"
 [storage]
   driver = "overlay"
   runroot = "/dev/shm/$USER/runroot"
@@ -24,9 +25,12 @@ Edit your `$HOME/.config/containers/storage.conf` according to the following min
 
 ## Modify the NGC Container
 
-See previous tutorial for context. Here, we assume we are already in a compute node (run `srun -A <ACCOUNT> --pty bash` to get an interactive session). In this case, we will be creating the dockerfile in `$SCRATCH/container-image/nanotron/Dockerfile`. These are the contents of the dockerfile:
+See previous tutorial for context.
+Here, we assume we are already in a compute node (run `srun -A <ACCOUNT> --pty bash` to get an interactive session).
+In this case, we will be creating the dockerfile in `$SCRATCH/container-image/nanotron/Dockerfile`.
+These are the contents of the dockerfile:
 
-```title="$SCRATCH/container-image/nanotron/Dockerfile"
+```dockerfile title="$SCRATCH/container-image/nanotron/Dockerfile"
 FROM nvcr.io/nvidia/pytorch:24.04-py3
 
 # Update flash-attn.
@@ -34,23 +38,23 @@ RUN pip install --upgrade --no-build-isolation flash-attn==2.5.8
 
 # Install the rest of dependencies.
 RUN pip install \
-	datasets \
-	transformers \
-	wandb \
-	dacite \
-	pyyaml \
-	numpy \
-	packaging \
-	safetensors \
-	tqdm
+    datasets \
+    transformers \
+    wandb \
+    dacite \
+    pyyaml \
+    numpy \
+    packaging \
+    safetensors \
+    tqdm
 ```
 
 Then build and import the container.
 
-```bash
-cd $SCRATCH/container-image/nanotron
-podman build -t nanotron:v1.0 .
-enroot import -x mount -o nanotron-v1.0.sqsh podman://nanotron:v1.0
+```console
+$ cd $SCRATCH/container-image/nanotron
+$ podman build -t nanotron:v1.0 .
+$ enroot import -x mount -o nanotron-v1.0.sqsh podman://nanotron:v1.0
 ```
 
 Now exit the interactive session by running `exit`.
@@ -59,7 +63,7 @@ Now exit the interactive session by running `exit`.
 
 See the previous tutorial for context. In this case, the edf will be at `$HOME/.edf/nanotron.toml` and will have the following contents:
 
-```title="$HOME/.edf/nanotron.toml"
+```toml title="$HOME/.edf/nanotron.toml"
 image = "/capstor/scratch/cscs/<USER>/container-image/nanotron/nanotron-v1.0.sqsh"
 mounts = ["/capstor", "/users"]
 workdir = "/users/<username>/" 
@@ -77,16 +81,17 @@ Note that, if you built your own container image, you will need to modify the im
 
 ### Preparing a Training Job
 
-Now let's download nanotron. In the login node run:
+Now let's download nanotron.
+In the login node run:
 
-```bash
-git clone https://github.com/huggingface/nanotron.git
-cd nanotron
+```console
+$ git clone https://github.com/huggingface/nanotron.git
+$ cd nanotron
 ```
 
 And with your favorite text editor, create the following nanotron configuration file in `$HOME/nanotron/examples/config_tiny_llama_wikitext.yaml`:
 
-```title="$HOME/nanotron/examples/config_tiny_llama_wikitext.yaml"
+```yaml title="$HOME/nanotron/examples/config_tiny_llama_wikitext.yaml"
 general:
   benchmark_csv_path: null
   consumed_train_samples: null
@@ -187,7 +192,9 @@ logging:
   log_level_replica: info
 ```
 
-This configuration file will train, as a proof of concept, a gpt-2-like (109M parameters) llama model with approximately 100M tokens of wikitext with settings `tp=4, dp=2, pp=1` (which means that it requires two nodes to train). This training job will require approximately 10 minutes to run. Now, create a batchfile in `$HOME/nanotron/run_tiny_llama.sh` with the contents:
+This configuration file will train, as a proof of concept, a gpt-2-like (109M parameters) llama model with approximately 100M tokens of wikitext with settings `tp=4, dp=2, pp=1` (which means that it requires two nodes to train).
+This training job will require approximately 10 minutes to run.
+Now, create a batchfile in `$HOME/nanotron/run_tiny_llama.sh` with the contents:
 
 ```bash title="$HOME/nanotron/run_tiny_llama.sh"
 #!/bin/bash
@@ -230,23 +237,28 @@ srun -ul --environment=nanotron bash -c "
 ```
 
 A few comments:
+
 - The parts outside the srun command will be run on the first node of the Slurm allocation for this job. srun commands without further specifiers execute with the settings of the sbatch script (i.e. using all nodes allocated to the job). 
 - If you have a [wandb](https://wandb.ai/) API key and want to synchronize the training run, be sure to set the `WANDB_API_KEY` variable. Otherwise, set `WANDB_MODE=of​f​line` instead.
 - Note that we are setting `HF_HOME` in a directory in scratch. This is done to place the downloaded dataset in scratch, instead of your home directory.
-- The pip install command is only run once in every container (compute node). Note that this will only link the nanotron python package to be able to import it in any script irrespective of the current working directory. Because all dependencies of nanotron are already installed in the Dockerfile, no extra libraries will be installed at this point. If the installation of the package under development creates artefacts on the shared filesystem (such as binaries from compiled C++/CUDA source code), this results in a race condition when run from multiple nodes. Therefore, in this case and also when additional external libraries are to be installed, you should either use venv as shown in previous tutorials, or directly build everything in the Dockerfile.
+- The pip install command is only run once in every container (compute node).
+Note that this will only link the nanotron python package to be able to import it in any script irrespective of the current working directory.
+Because all dependencies of nanotron are already installed in the Dockerfile, no extra libraries will be installed at this point.
+If the installation of the package under development creates artefacts on the shared filesystem (such as binaries from compiled C++/CUDA source code), this results in a race condition when run from multiple nodes.
+Therefore, in this case and also when additional external libraries are to be installed, you should either use venv as shown in previous tutorials, or directly build everything in the Dockerfile.
 
 ### Launch a Training Job with the new Image
 
 Run:
 
-```bash
-sbatch run_tiny_llama.sh
+```console
+$ sbatch run_tiny_llama.sh
 ```
 
 You can inspect if your job has been submitted successfully by running `squeue --me` and looking for your username. Once the run starts, there will be a new file under `logs/`. You can inspect the status of your run using:
 
-```
-tail -f logs/<logfile>
+```console
+$ tail -f logs/<logfile>
 ```
 
 In the end, the checkpoints of the model will be saved in `checkpoints/`.

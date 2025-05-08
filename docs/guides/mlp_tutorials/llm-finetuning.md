@@ -2,37 +2,46 @@
 
 # LLM Finetuning Tutorial
 
-This tutorial will take the model from the [LLM Inference][ref-mlp-llm-inference-tutorial] tutorial and show you how to perform finetuning. This means that we take the model and train it on some new custom data to change its behavior.
+This tutorial will take the model from the [LLM Inference][ref-mlp-llm-inference-tutorial] tutorial and show you how to perform finetuning.
+This means that we take the model and train it on some new custom data to change its behavior.
 
-To complete the tutorial, we set up some extra libraries that will help us to update the state of the machine learning model. We also write a script that will allow us to unlock more of the performance offered by the cluster, by running our fine-tuning task on two or more nodes.
+To complete the tutorial, we set up some extra libraries that will help us to update the state of the machine learning model.
+We also write a script that will allow us to unlock more of the performance offered by the cluster, by running our fine-tuning task on two or more nodes.
 
 ### Prerequisites
 
-This tutorial assumes you've already successfully completed the [LLM Inference][ref-mlp-llm-inference-tutorial] tutorial. For fine-tuning Gemma, we will rely on the NGC PyTorch container and the libraries we've already installed in the Python environment used previously.
+This tutorial assumes you've already successfully completed the [LLM Inference][ref-mlp-llm-inference-tutorial] tutorial.
+For fine-tuning Gemma, we will rely on the NGC PyTorch container and the libraries we've already installed in the Python environment used previously.
 
 ### Set up TRL
 
-We will use HuggingFace TRL to fine-tune Gemma-7B on the [OpenAssistant dataset](https://huggingface.co/datasets/OpenAssistant/oasst_top1_2023-08-25). First, we need to update our Python environment with some extra libraries to support TRL. To do this, we can launch an interactive shell in the PyTorch container, just like we did in the previous tutorial. Then, we install `peft`:
+We will use HuggingFace TRL to fine-tune Gemma-7B on the [OpenAssistant dataset](https://huggingface.co/datasets/OpenAssistant/oasst_top1_2023-08-25).
+First, we need to update our Python environment with some extra libraries to support TRL.
+To do this, we can launch an interactive shell in the PyTorch container, just like we did in the previous tutorial.
+Then, we install `peft`:
 
-```bash
-cd $SCRATCH/gemma-inference
-srun --environment=gemma-pytorch --container-workdir=$PWD --pty bash
-source ./gemma-venv/bin/activate
-python -m pip install peft==0.11.1
+```console
+$ cd $SCRATCH/gemma-inference
+$ srun --environment=gemma-pytorch --container-workdir=$PWD --pty bash
+$ source ./gemma-venv/bin/activate
+$ python -m pip install peft==0.11.1
 ```
 
-Next, we also need to clone and install the `trl` Git repository so that we have access to the fine-tuning scripts in it. For this purpose, we will install the package in editable mode in the virtual environment. This makes it available in python scripts independent of the current working directory and without creating a redundant copy of the files.
+Next, we also need to clone and install the `trl` Git repository so that we have access to the fine-tuning scripts in it.
+For this purpose, we will install the package in editable mode in the virtual environment.
+This makes it available in python scripts independent of the current working directory and without creating a redundant copy of the files.
 
-```
-[cluster][user@cluster-ln001 ~]$ git clone https://github.com/huggingface/trl -b v0.7.11
-[cluster][user@cluster-ln001 ~]$ pip install -e ./trl   # install in editable mode
+```console
+$ git clone https://github.com/huggingface/trl -b v0.7.11
+$ pip install -e ./trl   # install in editable mode
 ```
 
 When this step is complete, you can exit the shell by typing `exit`.
 
 ### Finetune Gemma-7B
 
-t this point, we can set up a fine-tuning script and start training Gemma-7B. Use your favorite text editor to create the file `fine-tune-gemma.sh` just outside the trl and gemma-venv directories:
+t this point, we can set up a fine-tuning script and start training Gemma-7B.
+Use your favorite text editor to create the file `fine-tune-gemma.sh` just outside the trl and gemma-venv directories:
 
 ```bash title="fine-tune-gemma.sh"
 #!/bin/bash
@@ -40,7 +49,7 @@ t this point, we can set up a fine-tuning script and start training Gemma-7B. Us
 source ./gemma-venv/bin/activate
 
 set -x
- 
+
 export HF_HOME=$SCRATCH/huggingface
 export TRANSFORMERS_VERBOSITY=info
 
@@ -60,16 +69,27 @@ accelerate launch --config_file trl/examples/accelerate_configs/multi_gpu.yaml \
            --gradient_accumulation_steps 1 \
            --learning_rate 2e-4 \
            --save_steps 200 \
-	       --max_steps 400 \
+           --max_steps 400 \
            --use_peft \
            --lora_r 16 --lora_alpha 32 \
            --lora_target_modules q_proj k_proj v_proj o_proj \
            --output_dir gemma-finetuned-openassistant
 ```
 
-This script has quite a bit more content to unpack. We use HuggingFace accelerate to launch the fine-tuning process, so we need to make sure that accelerate understands which hardware is available and where. Setting this up will be useful in the long run because it means we can tell SLURM how much hardware to reserve, and this script will setup all the details for us.
+This script has quite a bit more content to unpack.
+We use HuggingFace accelerate to launch the fine-tuning process, so we need to make sure that accelerate understands which hardware is available and where.
+Setting this up will be useful in the long run because it means we can tell SLURM how much hardware to reserve, and this script will setup all the details for us.
 
-The cluster has four GH200 chips per compute node. We can make them accessible to scripts run through srun/sbatch via the option `--gpus-per-node=4`. Then, we calculate how many processes accelerate should launch. We want to map each GPU to a separate process, this should be four processes per node. We multiply this by the number of nodes to obtain the total number of processes. Next, we use some bash magic to extract the name of the head node from SLURM environment variables. Accelerate expects one main node and launches tasks on the other nodes from this main node. Having sourced our python environment at the top of the script, we can then launch Gemma fine-tuning. The first four lines of the launch line are used to configure accelerate. Everything after that configures the `trl/examples/scripts/sft.py` Python script, which we use to train Gemma.
+The cluster has four GH200 chips per compute node.
+We can make them accessible to scripts run through srun/sbatch via the option `--gpus-per-node=4`.
+Then, we calculate how many processes accelerate should launch.
+We want to map each GPU to a separate process, this should be four processes per node.
+We multiply this by the number of nodes to obtain the total number of processes.
+Next, we use some bash magic to extract the name of the head node from SLURM environment variables.
+Accelerate expects one main node and launches tasks on the other nodes from this main node.
+Having sourced our python environment at the top of the script, we can then launch Gemma fine-tuning.
+The first four lines of the launch line are used to configure accelerate.
+Everything after that configures the `trl/examples/scripts/sft.py` Python script, which we use to train Gemma.
 
 Next, we also need to create a short SLURM batch script to launch our fine-tuning script:
 
@@ -87,26 +107,31 @@ set -x
 srun -ul --environment=gemma-pytorch --container-workdir=$PWD bash fine-tune-gemma.sh
 ```
 
-We set a few Slurm parameters like we already did in the previous tutorial. Note that we leave the number of nodes unspecified. This way, we can decide the number of nodes we want to use when we launch the batch job using Slurm.
+We set a few Slurm parameters like we already did in the previous tutorial.
+Note that we leave the number of nodes unspecified.
+This way, we can decide the number of nodes we want to use when we launch the batch job using Slurm.
 
-Now that we've setup a fine-tuning script and a Slurm batch script, we can launch our fine-tuning job. We'll start out by launching it on two nodes. It should take about 10-15 minutes to fine-tune Gemma:
+Now that we've setup a fine-tuning script and a Slurm batch script, we can launch our fine-tuning job.
+We'll start out by launching it on two nodes.
+It should take about 10-15 minutes to fine-tune Gemma:
 
-```
-[cluster][user@cluster-ln001 ~]$ sbatch --nodes=1 fine-tune-sft.sbatch
+```console
+$ sbatch --nodes=1 fine-tune-sft.sbatch
 ```
 
 ### Compare finetuned Gemma against default Gemma
 
-We can reuse our python script from the first tutorial to do inference on the Gemma model that we just fine-tuned. Let's try out a different prompt in `gemma-inference.py`:
+We can reuse our python script from the first tutorial to do inference on the Gemma model that we just fine-tuned.
+Let's try out a different prompt in `gemma-inference.py`:
 
-```
+```python
 input_text = "What are the 5 tallest mountains in the Swiss Alps?"
 ```
 
 We can run inference using our batch script from the previous tutorial:
 
-```
-[cluster][user@cluster-ln001 ~]$ sbatch ./gemma-inference.sbatch
+```console
+$ sbatch ./gemma-inference.sbatch
 ```
 
 Inspecting the output should yield something like this:
@@ -126,7 +151,7 @@ the 5 tallest mountains in the Swiss Alps:
 
 Next, we can update the model line in our Python inference script to use the model that we just fine-tuned:
 
-```
+```python
 model = AutoModelForCausalLM.from_pretrained("gemma-finetuned-openassistant/checkpoint-400", device_map="auto")
 ```
 
@@ -157,8 +182,9 @@ n canton of Switzerland, and it is a popular destination for mountaineers and hi
 These mountains are all located in the Swiss Alps, and they are a popular destination for mountaineers and hikers. If you are planning a trip to the Swiss Alps, be sure to check out these mountains and plan your itinerary accordingly.
 ```
 
-Your output may look different after fine-tuning, but in general you will see that the fine-tuned model generates more verbose output. Double-checking the output reveals that the list of mountains produced by Gemma is not actually correct. The following table lists the 5 tallest Swiss peaks, according to Wikipedia.
-
+Your output may look different after fine-tuning, but in general you will see that the fine-tuned model generates more verbose output.
+Double-checking the output reveals that the list of mountains produced by Gemma is not actually correct.
+These are the 5 tallest Swiss peaks according to Wikipedia:
 
 1. Dufourspitze 4,634m
 2. Nordend 4,609m
