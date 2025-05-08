@@ -100,6 +100,11 @@ nav:
     - 'Internet Access on Alps': guides/internet-access.md
     - 'Storage': guides/storage.md
     - 'Using the terminal': guides/terminal.md
+    - 'MLP Tutorials':
+      - guides/mlp_tutorials/index.md
+      - 'LLM Inference': guides/mlp_tutorials/llm-inference.md
+      - 'LLM Finetuning': guides/mlp_tutorials/llm-finetuning.md
+      - 'LLM Training': guides/mlp_tutorials/llm-nanotron-training.md
   - 'Policies':
     - policies/index.md
     - 'User Regulations': policies/regulations.md
