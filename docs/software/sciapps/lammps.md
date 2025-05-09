@@ -5,9 +5,15 @@
 It can model atomic, polymeric, biological, metallic, granular, and coarse-grained systems using a variety of force fields and boundary conditions. 
 The current version of LAMMPS is written in C++.
 
+!!! note 
+    !!! note "uenvs"
+    [LAMMPS](https://www.lammps.org/) is provided on [ALPS][platforms-on-alps] via [uenv][ref-uenv].
+    Please have a look at the [uenv documentation][ref-uenv] for more information about uenvs and how to use them.
+
 ## Licensing Terms and Conditions
 
-LAMMPS is a freely-available open-source code, distributed under the terms of the [GNU Public License].
+??? note "Licensing terms and conditions"
+    [LAMMPS] is a freely-available open-source code, distributed under the terms of the [GNU Public License](http://www.gnu.org/copyleft/gpl.html).
 
 ## Running  LAMMPS
 
@@ -290,7 +296,7 @@ source spack/share/spack/setup-env.sh
 export SPACK_SYSTEM_CONFIG_PATH=/user-environment/config/
 ```
 
-Then create the path and file `$SCRATCH/custom_env/spack.yaml`. We'll disable the KOKKOS package (and enable the GPU package via +cuda spec), and add the CG-SPICA package (via the +cg-spica spec) as an example. You can get the full list of options here: https://packages.spack.io/package.html?name=lammps.
+Then create the path and file `$SCRATCH/custom_env/spack.yaml`. We'll disable the KOKKOS package (and enable the GPU package via +cuda spec), and add the CG-SPICA package (via the +cg-spica spec) as an example. You can get the full list of options on [the LAMMPS spack package overview](https://packages.spack.io/package.html?name=lammps).
 
 ```
 spack:
