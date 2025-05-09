@@ -65,12 +65,12 @@ submission script:
 ```bash title="run_lammps_kokkos.sh"
 #!/bin/bash -l
 #SBATCH --job-name=<JOB_NAME>
-#SBATCH --time=01:00:00 # (1)!
+#SBATCH --time=01:00:00 (1)
 #SBATCH --nodes=2                                                                        
-#SBATCH --ntasks-per-node=4 # (2)!
+#SBATCH --ntasks-per-node=4  (2)
 #SBATCH --gres=gpu:4
-#SBATCH --account=<ACCOUNT> # (3)!
-#SBATCH --uenv=<LAMMPS_UENV>:/user-environment # (4)!
+#SBATCH --account=<ACCOUNT> (3)
+#SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
 #SBATCH --view=kokkos
 
 export MPICH_GPU_SUPPORT_ENABLED=1
@@ -157,12 +157,12 @@ To start a job, 2 bash scripts are required:
 ```bash title="run_lammps_gpu.sh"
 #!/bin/bash -l
 #SBATCH --job-name=<JOB_NAME>
-#SBATCH --time=01:00:00
+#SBATCH --time=01:00:00 (1)
 #SBATCH --nodes=2                                                                        
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=32 (2)
 #SBATCH --gres=gpu:4
-#SBATCH --account=<ACCOUNT>                                                                  
-#SBATCH --uenv=<LAMMPS_UENV>:/user-environment
+#SBATCH --account=<ACCOUNT> (3)                                                                  
+#SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
 #SBATCH --view=gpu
 
 export MPICH_GPU_SUPPORT_ENABLED=1
@@ -172,10 +172,10 @@ ulimit -s unlimited
 srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 ```
 
-* Time format: `HH:MM:SS`.
-* For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
-* Change `<ACCOUNT>` to your project account name.
-* Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+1. Time format: `HH:MM:SS`.
+2. For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
+3. Change `<ACCOUNT>` to your project account name.
+4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 
 #### LAMMPS + kokkos input file
 
