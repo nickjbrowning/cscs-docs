@@ -42,8 +42,14 @@ Users are encouraged to use containers on Clariden.
 
 * Jobs using containers can be easily set up and submitted using the [container engine][ref-container-engine].
 * To build images, see the [guide to building container images on Alps][ref-build-containers].
+* Base images which include the necessary libraries and compilers are for example available from the [Nvidia NGC Catalog](https://catalog.ngc.nvidia.com/containers):
+    * [HPC NGC container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/nvhpc)
+    * [PyTorch NGC container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
 
-Alternatively, [uenv][ref-uenv] are also available on Clariden. Currently the only uenv that is deployed on Clariden is [prgenv-gnu][ref-uenv-prgenv-gnu].
+Alternatively, [uenv][ref-uenv] are also available on Clariden. Currently deployed on Clariden:
+
+* [prgenv-gnu][ref-uenv-prgenv-gnu]
+* [pytorch][ref-uenv-pytorch]
 
 ??? example "using uenv provided for other clusters"
     You can run uenv that were built for other Alps clusters using the `@` notation.
@@ -73,12 +79,13 @@ There are two slurm partitions on the system:
 
 | name | nodes  | max nodes per job | time limit |
 | --   | --     | --                | -- |
-| `normal` | 1266       | -    | 24 hours |
-| `debug`  | 32         | 2    | 30 minutes |
+| `normal` | 1204       | -    | 24 hours |
+| `debug`  | 24         | 2    | 1.5 node-hours |
 | `xfer`   | 2          | 1    | 24 hours |
 
 * nodes in the `normal` and `debug` partitions are not shared
 * nodes in the `xfer` partition can be shared
+* nodes in the `debug` queue have a 1.5 node-hour time limit. This means you could for example request 2 nodes for 45 minutes each, or 1 single node for the full time limit.
 
 See the SLURM documentation for instructions on how to run jobs on the [Grace-Hopper nodes][ref-slurm-gh200].
 
@@ -95,7 +102,7 @@ See the SLURM documentation for instructions on how to run jobs on the [Grace-Ho
 
 ### FirecREST
 
-Clariden can also be accessed using [FircREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
+Clariden can also be accessed using [FirecREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
 
 ## Maintenance and status
 

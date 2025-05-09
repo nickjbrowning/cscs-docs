@@ -7,10 +7,7 @@ Santis is an Alps cluster that provides GPU accelerators and file systems design
 
 ### Compute nodes
 
-Santis consists of around 600 [Grace-Hopper nodes][ref-alps-gh200-node].
-
-!!! note
-    In late March 2025 Santis was temporarily expanded to 1233 nodes for [Gordon Bell and HPL runs][ref-gb2025].
+Santis consists of around 430 [Grace-Hopper nodes][ref-alps-gh200-node].
 
 The number of nodes can change when nodes are added or removed from other clusters on Alps.
 
@@ -19,7 +16,7 @@ You will be assigned to one of the four login nodes when you ssh onto the system
 
 | node type | number of nodes | total CPU sockets | total GPUs |
 |-----------|-----------------| ----------------- | ---------- |
-| [gh200][ref-alps-gh200-node] | 600 | 2,400      | 2,400 |
+| [gh200][ref-alps-gh200-node] | 430 | 1,720      | 1,720 |
 
 ### Storage and file systems
 
@@ -51,7 +48,7 @@ Currently, the following uenv are provided for the climate and weather community
 * `icon/25.1`
 * `climana/25.1`
 
-In adition to the climate and weather uenv, all of the 
+In addition to the climate and weather uenv, all of the
 
 ??? example "using uenv provided for other clusters"
     You can run uenv that were built for other Alps clusters using the `@` notation.
@@ -105,11 +102,11 @@ See the SLURM documentation for instructions on how to run jobs on the [Grace-Ho
     | normal               | 1266       | 1-infinite | 1-00:00:00 | 812/371    |
     | xfer                 | 2          | 1          | 1-00:00:00 | 1/1        |
     ```
-    The last column shows the number of nodes that have been allocted in currently running jobs (`A`) and the number of jobs that are idle (`I`).
+    The last column shows the number of nodes that have been allocated in currently running jobs (`A`) and the number of jobs that are idle (`I`).
 
 ### FirecREST
 
-Santis can also be accessed using [FircREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
+Santis can also be accessed using [FirecREST][ref-firecrest] at the `https://api.cscs.ch/ml/firecrest/v1` API endpoint.
 
 ## Maintenance and status
 
