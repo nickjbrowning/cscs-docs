@@ -172,8 +172,10 @@ ulimit -s unlimited
 srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 ```
 
+To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
+
 1. Time format: `HH:MM:SS`.
-2. For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
+2. For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU.
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 
