@@ -56,9 +56,9 @@ uenv start --view develop-kokkos lammps/2024:v2
 uenv start --view develop-gpu lammps/2024:v2
 ```
 
-### Running LAMMPS+kokkos on the HPC Platform
+### Running LAMMPS with Kokkos on the HPC Platform
 
-To start  a job, two bash scripts are potentially required: a [SLURM] submission script, and a wrapper for numacontrol which sets up cpu and memory binding:
+To start  a job, two bash scripts are potentially required: a [SLURM] submission script, and a wrapper for `numactl` which sets up CPU and memory binding:
 
 submission script:
 
@@ -85,7 +85,7 @@ srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 
-numacontrol wrapper:
+`numactl` wrapper:
 
 ```bash title="wrapper.sh"
 #!/bin/bash
@@ -227,19 +227,17 @@ run             $t
 
 ### Using CMake
 
-```
-If you'd like to rebuild LAMMPS from source to add additional packages or to use your own customized code, you can use the develop views contained within the uenv image to provide you with all the necessary libraries and command-line tools you'll need. For the following, we'd recommend obtaining an interactive node and building inside the tempfs directory.
-```
+If you'd like to rebuild LAMMPS from source to add additional packages or to use your own customized code, you can use the develop views contained within the uenv image to provide you with all the necessary libraries and command-line tools you'll need.
+For the following, we'd recommend obtaining an interactive node and building inside the tmpfs directory.
 
-```
+```bash
 salloc -N1 -t 60 -A <account>
-...
 srun --pty bash
-...
 mkdir /dev/shm/lammps_build; cd /dev/shm/lammps_build
 ```
 
-After you've obtained a version of LAMMPS you'd like to build, extract it in the above temporary folder, and create a build directory. Load one of the two following views:
+After you've obtained a version of LAMMPS you'd like to build, extract it in the above temporary folder and create a build directory. 
+Load one of the two following views:
 
 ```
 #build environment for lammps +kokkos package, without providing lmp executeable
@@ -248,7 +246,8 @@ uenv start --view develop-kokkos lammps/2024:v2-rc1
 uenv start --view develop-gpu lammps/2024:v2-rc1
 ```
 
-and now you can build your local copy of LAMMPS. For example to build with kokkos and the `MOLECULE` package enabled:
+and now you can build your local copy of LAMMPS. 
+For example to build with kokkos and the `MOLECULE` package enabled:
 
 ```
 CC=mpicc CXX=mpic++ cmake \
@@ -271,7 +270,9 @@ CC=mpicc CXX=mpic++ cmake \
 
 !!! `Warning` !!!
 
-If you are downloading LAMMPS from github or their website and intend to use kokkos for acceleration, there is an issue with cray-mpich and kokkos versions <= 4.3. For LAMMPS to work correctly on our system, you need a LAMMPS version which provides kokkos >= 4.4. Alternatively, the cmake variable `-DEXTERNAL_KOKKOS=yes` should force cmake to use the kokkos version (4.5.01) provided by the uenv, rather than the one contained within the lammps distribution.
+If you are downloading LAMMPS from github or their website and intend to use kokkos for acceleration, there is an issue with cray-mpich and kokkos versions <= 4.3. 
+For LAMMPS to work correctly on our system, you need a LAMMPS version which provides kokkos >= 4.4. 
+Alternatively, the cmake variable `-DEXTERNAL_KOKKOS=yes` should force cmake to use the kokkos version (4.5.01) provided by the uenv, rather than the one contained within the lammps distribution.
 
 ### Using LAMMPS uenv as an upstream Spack Instance
 
@@ -280,7 +281,7 @@ If you'd like to extend the existing uenv with additional packages (or your own)
 First, set up an environment:
 
 ```
-uenv start --view develop-gpu lammps/2024:v2-rc1
+uenv start --view develop-gpu lammps/2024:v2
 
 git clone -b v0.23.0 https://github.com/spack/spack.git
 source spack/share/spack/setup-env.sh
@@ -347,4 +348,4 @@ CG-SPICA GPU KSPACE MANYBODY MOLECULE PYTHON RIGID
 [LAMMPS]: https://www.lammps.org
 [GNU Public License]: http://www.gnu.org/copyleft/gpl.html
 [uenv]: https://eth-cscs.github.io/cscs-docs/software/uenv
-[SLURM]: https://slurm.schedmd.com/documentation.html
+[SLURM]: https://eth-cscs.github.io/cscs-docs/running/slurm
