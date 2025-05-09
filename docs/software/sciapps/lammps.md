@@ -5,8 +5,7 @@
 It can model atomic, polymeric, biological, metallic, granular, and coarse-grained systems using a variety of force fields and boundary conditions. 
 The current version of LAMMPS is written in C++.
 
-!!! note 
-    !!! note "uenvs"
+!!! note "uenvs"
     [LAMMPS](https://www.lammps.org/) is provided on [ALPS][platforms-on-alps] via [uenv][ref-uenv].
     Please have a look at the [uenv documentation][ref-uenv] for more information about uenvs and how to use them.
 
@@ -92,7 +91,7 @@ srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 5. Load the `kokkos` uenv view.
 
-`numactl` wrapper:
+the `numactl` wrapper is the following:
 
 ```bash title="wrapper.sh"
 #!/bin/bash
@@ -108,20 +107,16 @@ export MPICH_GPU_SUPPORT_ENABLED=1
 numactl --cpunodebind=$NUMA_NODE --membind=$NUMA_NODE "$@"
 ```
 
-With the above scripts, you can launch a LAMMPS + kokkos calculation on 2 nodes, using 4 MPI-ranks per node and 4 GPUs per node with:
+With the above scripts, you can launch a LAMMPS+kokkos calculation on 2 nodes, using 4 MPI ranks per node and 4 GPUs per node with:
 
 ```bash
 sbatch run_lammps_kokkos.sh
 ```
 
-You may need to make the `wrapper.sh` script executeable via: `chmod +x wrapper.sh`.
+You may need to make the `wrapper.sh` script executable (`chmod +x wrapper.sh`).
 
 #### LAMMPS + kokkos input file
-
-Below is the input file used in the above script, defining a 3d Lennard-Jones melt.
-
-??? example "LAMMPS+kokkos input file"
-    Below is the input file ...
+??? example "LAMMPS+kokkos input file, defining a 3d Lennard-Jones melt."
     ```
     variable        x index 200
     variable        y index 200
@@ -282,9 +277,9 @@ CC=mpicc CXX=mpic++ cmake \
 
 !!! `Warning` !!!
 
-If you are downloading LAMMPS from github or their website and intend to use kokkos for acceleration, there is an issue with cray-mpich and kokkos versions <= 4.3. 
-For LAMMPS to work correctly on our system, you need a LAMMPS version which provides kokkos >= 4.4. 
-Alternatively, the cmake variable `-DEXTERNAL_KOKKOS=yes` should force cmake to use the kokkos version (4.5.01) provided by the uenv, rather than the one contained within the lammps distribution.
+If you are downloading LAMMPS from GitHub or their website and intend to use kokkos for acceleration, there is an issue with Cray MPICH and `kokkos <= 4.3`. 
+For LAMMPS to work correctly on our system, you need a LAMMPS version which provides `kokkos >= 4.4`. 
+Alternatively, the CMake variable `-DEXTERNAL_KOKKOS=yes` should force CMake to use the kokkos version provided by the uenv, rather than the one contained within the lammps distribution.
 
 #### Using LAMMPS uenv as an upstream Spack Instance
 
