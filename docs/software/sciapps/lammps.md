@@ -1,73 +1,76 @@
 [](){#ref-uenv-lammps}
 # LAMMPS
 
-[LAMMPS](https://www.lammps.org/) is a classical molecular dynamics code that models an ensemble of particles in a liquid, solid, or gaseous state. It can model atomic, polymeric, biological, metallic, granular, and coarse-grained systems using a variety of force fields and boundary conditions. The current version of LAMMPS is written in C++.
+[LAMMPS] is a classical molecular dynamics code that models an ensemble of particles in a liquid, solid, or gaseous state.
+It can model atomic, polymeric, biological, metallic, granular, and coarse-grained systems using a variety of force fields and boundary conditions. 
+The current version of LAMMPS is written in C++.
 
 ## Licensing Terms and Conditions
 
-[LAMMPS] is a freely-available open-source code, distributed under the terms of the [GNU Public License](http://www.gnu.org/copyleft/gpl.html).
+LAMMPS is a freely-available open-source code, distributed under the terms of the [GNU Public License].
 
 ## Running  LAMMPS
 
 ### Loading LAMMPS Interactively
 
-On Alps, [LAMMPS] is precompiled and available in a user environment (uenv). LAMMPS has been built with kokkos, and the GPU package separately.
+On Alps, LAMMPS is precompiled and available in a user environment [uenv]. 
+LAMMPS has been built with kokkos, and the GPU package separately.
 
 To find which LAMMPS uenv is provided, you can use the following command:
 
 ```
 uenv image find lammps
-└── uenv image find lammps
-uenv/version:tag uarch date id size
-lammps/2024:v1      gh200  daint   3483b476b75a1801   3,713    2024-06-03
-lammps/2024:v2-rc1  gh200  daint   fc5aafe8f327553c   3,625    2025-02-05
 ```
 
-We recommend using `lammps/2024:v2-rc1` as it's the latest build. To obtain this image, please run:
+which will list several uenv lammps uenv images. 
+We recommend that you regularly check for the latest version.
+Please see the documentation here for further details: https://eth-cscs.github.io/cscs-docs/software/uenv/#finding-uenv.
 
-```
-uenv image pull lammps/2024:v2-rc1
+To obtain this image, please run:
+
+```bash
+uenv image pull lammps/2024:v2
 ```
 
 To start the uenv for this specific version of LAMMPS, you can use:
 
-```
-uenv start --view kokkos lammps/2024:v2-rc1
+```bash
+uenv start --view kokkos lammps/2024:v2
 ```
 
 You can load the `view` from the uenv which contains the `lmp` executable. The executable in both these views support GPUs:
 
-```
+```bash
 #lammps +kokkos packae
-uenv start --view kokkos lammps/2024:v2-rc1
+uenv start --view kokkos lammps/2024:v2
 #lammps +gpu package, kokkos disabled
-uenv start --view gpu lammps/2024:v2-rc1
+uenv start --view gpu lammps/2024:v2
 ```
 
 A development view is also provided, which contains all libraries and command-line tools necessary to build LAMMPS from source, without including the LAMMPS executable:
 
-```
-#build environment for lammps +kokkos package, without providing lmp executeable
-uenv start --view develop-kokkos lammps/2024:v2-rc1
-#build environment for lammps +gpu package, without providing lmp executeable
-uenv start --view develop-gpu lammps/2024:v2-rc1
+```bash
+# build environment for lammps +kokkos package, without providing lmp executable
+uenv start --view develop-kokkos lammps/2024:v2
+# build environment for lammps +gpu package, without providing lmp executable
+uenv start --view develop-gpu lammps/2024:v2
 ```
 
 ### Running LAMMPS+kokkos on the HPC Platform
 
-To start  a job, two bash scripts are potentially required: a [slurm] submission script, and a wrapper for numacontrol which sets up cpu and memory binding:
+To start  a job, two bash scripts are potentially required: a [SLURM] submission script, and a wrapper for numacontrol which sets up cpu and memory binding:
 
 submission script:
 
 ```bash title="run_lammps_kokkos.sh"
 #!/bin/bash -l
 #SBATCH --job-name=<JOB_NAME>
-#SBATCH --time=01:00:00
+#SBATCH --time=01:00:00 # (1)!
 #SBATCH --nodes=2                                                                        
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=4 # (2)!
 #SBATCH --gres=gpu:4
-#SBATCH --account=<ACCOUNT>
-#SBATCH --uenv=<LAMMPS_UENV>:/user-environment
+#SBATCH --account=<ACCOUNT> # (3)!
+#SBATCH --uenv=<LAMMPS_UENV>:/user-environment # (4)!
 #SBATCH --view=kokkos
 
 export MPICH_GPU_SUPPORT_ENABLED=1
@@ -77,10 +80,10 @@ ulimit -s unlimited
 srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 ```
 
-* Time format: `HH:MM:SS`.
-* For LAMMPS+kokkos its typical to only use 1 MPI-rank per GPU.
-* Change `<ACCOUNT>` to your project account name.
-* Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+1. Time format: `HH:MM:SS`.
+2. For LAMMPS+kokkos its typical to only use 1 MPI-rank per GPU.
+3. Change `<ACCOUNT>` to your project account name.
+4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 
 numacontrol wrapper:
 
@@ -98,7 +101,7 @@ export MPICH_GPU_SUPPORT_ENABLED=1
 numactl --cpunodebind=$NUMA_NODE --membind=$NUMA_NODE "$@"
 ```
 
-With the above scripts, you can launch a [LAMMPS] + kokkos calculation on 2 nodes, using 4 MPI-ranks per node and 4 GPUs per node with:
+With the above scripts, you can launch a LAMMPS + kokkos calculation on 2 nodes, using 4 MPI-ranks per node and 4 GPUs per node with:
 
 ```bash
 sbatch run_lammps_kokkos.sh
@@ -341,3 +344,7 @@ CG-SPICA GPU KSPACE MANYBODY MOLECULE PYTHON RIGID
 
 !!! TODO !!!
 
+[LAMMPS]: https://www.lammps.org
+[GNU Public License]: http://www.gnu.org/copyleft/gpl.html
+[uenv]: https://eth-cscs.github.io/cscs-docs/software/uenv
+[SLURM]: https://slurm.schedmd.com/documentation.html
