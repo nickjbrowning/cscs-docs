@@ -64,9 +64,9 @@ uenv start --view develop-gpu lammps/2024:v2
 
 ### Running LAMMPS with Kokkos on the HPC Platform
 
-To start  a job, two bash scripts are potentially required: a [SLURM] submission script, and a wrapper for `numactl` which sets up CPU and memory binding:
+To start  a job, two bash scripts are potentially required: a [SLURM] submission script, and a wrapper for `numactl` which sets up CPU and memory binding.
 
-submission script:
+The submission script is the following:
 
 ```bash title="run_lammps_kokkos.sh"
 #!/bin/bash -l
@@ -77,7 +77,7 @@ submission script:
 #SBATCH --gres=gpu:4
 #SBATCH --account=<ACCOUNT> (3)
 #SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
-#SBATCH --view=kokkos
+#SBATCH --view=kokkos (5)
 
 export MPICH_GPU_SUPPORT_ENABLED=1
  
@@ -90,6 +90,7 @@ srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 2. For LAMMPS+kokkos its typical to only use 1 MPI-rank per GPU.
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+5. Load the `kokkos` uenv view.
 
 `numactl` wrapper:
 
@@ -119,46 +120,48 @@ You may need to make the `wrapper.sh` script executeable via: `chmod +x wrapper.
 
 Below is the input file used in the above script, defining a 3d Lennard-Jones melt.
 
-```
-variable        x index 200
-variable        y index 200
-variable        z index 200
-variable        t index 1000
+??? example "LAMMPS+kokkos input file"
+    Below is the input file ...
+    ```
+    variable        x index 200
+    variable        y index 200
+    variable        z index 200
+    variable        t index 1000
 
-variable        xx equal 1*$x
-variable        yy equal 1*$y
-variable        zz equal 1*$z
+    variable        xx equal 1*$x
+    variable        yy equal 1*$y
+    variable        zz equal 1*$z
 
-variable        interval equal $t/2
+    variable        interval equal $t/2
 
-units           lj
-atom_style      atomic/kk
+    units           lj
+    atom_style      atomic/kk
 
-lattice         fcc 0.8442
-region          box block 0 ${xx} 0 ${yy} 0 ${zz}
-create_box      1 box
-create_atoms    1 box
-mass            1 1.0
+    lattice         fcc 0.8442
+    region          box block 0 ${xx} 0 ${yy} 0 ${zz}
+    create_box      1 box
+    create_atoms    1 box
+    mass            1 1.0
 
-velocity        all create 1.44 87287 loop geom
+    velocity        all create 1.44 87287 loop geom
 
-pair_style      lj/cut/kk 2.5
-pair_coeff      1 1 1.0 1.0 2.5
+    pair_style      lj/cut/kk 2.5
+    pair_coeff      1 1 1.0 1.0 2.5
 
-neighbor        0.3 bin
-neigh_modify    delay 0 every 20 check no
+    neighbor        0.3 bin
+    neigh_modify    delay 0 every 20 check no
 
-fix             1 all nve
+    fix             1 all nve
 
-thermo          ${interval}
-thermo_style custom step time  temp press pe ke etotal density
-run_style       verlet/kk
-run             $t
-```
+    thermo          ${interval}
+    thermo_style custom step time  temp press pe ke etotal density
+    run_style       verlet/kk
+    run             $t
+    ```
 
 ### Running LAMMPS+GPU on the HPC Platform
 
-To start a job, 2 bash scripts are required:
+To start a job, two bash scripts are required: a [Slurm][ref-slurm] submission script, and a wrapper for `numactl` which sets up CPU and memory binding.
 
 ```bash title="run_lammps_gpu.sh"
 #!/bin/bash -l
@@ -169,7 +172,7 @@ To start a job, 2 bash scripts are required:
 #SBATCH --gres=gpu:4
 #SBATCH --account=<ACCOUNT> (3)                                                                  
 #SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
-#SBATCH --view=gpu
+#SBATCH --view=gpu (5)
 
 export MPICH_GPU_SUPPORT_ENABLED=1
  
@@ -184,6 +187,7 @@ To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wra
 2. For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU.
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+5. Load the `gpu` uenv view.
 
 #### LAMMPS + kokkos input file
 
@@ -233,7 +237,7 @@ run             $t
 
 ### Building LAMMPS from source
 
-### Using CMake
+#### Using CMake
 
 If you'd like to rebuild LAMMPS from source to add additional packages or to use your own customized code, you can use the develop views contained within the uenv image to provide you with all the necessary libraries and command-line tools you'll need.
 For the following, we'd recommend obtaining an interactive node and building inside the tmpfs directory.
@@ -282,7 +286,7 @@ If you are downloading LAMMPS from github or their website and intend to use kok
 For LAMMPS to work correctly on our system, you need a LAMMPS version which provides kokkos >= 4.4. 
 Alternatively, the cmake variable `-DEXTERNAL_KOKKOS=yes` should force cmake to use the kokkos version (4.5.01) provided by the uenv, rather than the one contained within the lammps distribution.
 
-### Using LAMMPS uenv as an upstream Spack Instance
+#### Using LAMMPS uenv as an upstream Spack Instance
 
 If you'd like to extend the existing uenv with additional packages (or your own), you can use the provide LAMMPS uenv to provide all dependencies needed to build your customization. See https://eth-cscs.github.io/alps-uenv/uenv-compilation-spack/ for more information.
 
