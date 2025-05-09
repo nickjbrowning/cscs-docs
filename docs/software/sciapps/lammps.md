@@ -113,7 +113,7 @@ You may need to make the `wrapper.sh` script executeable via: `chmod +x wrapper.
 
 Below is the input file used in the above script, defining a 3d Lennard-Jones melt.
 
-```name="lj_kokkos.in"
+```
 variable        x index 200
 variable        y index 200
 variable        z index 200
