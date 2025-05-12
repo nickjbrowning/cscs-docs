@@ -226,7 +226,7 @@ To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wra
 
 ### Running on Eiger
 
-On Eiger, a similar sbatch script can be used:
+On Eiger, the following sbatch script can be used:
 
 ```bash title="run_lammps_eiger.sh"
 #!/bin/bash -l
@@ -256,6 +256,8 @@ srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj_kokkos.in
 4. Change `<ACCOUNT>` to your project account name.
 5. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 6. Enable the `kokkos` uenv view.
+
+Note that the same input file `lj_kokkos.in` can be used as with running LAMMPS with Kokkos on the HPC Platform.
 
 ### Building LAMMPS from source
 
