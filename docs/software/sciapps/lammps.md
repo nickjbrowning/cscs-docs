@@ -19,7 +19,7 @@ The current version of LAMMPS is written in C++.
 ### Loading LAMMPS Interactively
 
 On Alps, LAMMPS is precompiled and available in a user environment [uenv]. 
-LAMMPS has been built with the Kokkos and GPU packages separately.
+LAMMPS has been built with the [Kokkos](https://docs.lammps.org/Speed_kokkos.html) and GPU packages separately.
 
 To find which LAMMPS uenv is provided, you can use the following command:
 
@@ -154,7 +154,7 @@ You may need to make the `wrapper.sh` script executable (`chmod +x wrapper.sh`).
     run             $t
     ```
 
-### Running LAMMPS+GPU on the HPC Platform
+### Running LAMMPS + GPU on the HPC Platform
 
 To start a job, two bash scripts are required: a [Slurm][ref-slurm] submission script, and a wrapper for [CUDA MPS][ref-slurm-gh200-multi-rank-per-gpu].
 
@@ -226,7 +226,35 @@ To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wra
 
 ### Running on Eiger
 
-!!! TODO !!!
+On Eiger, a similar sbatch script can be used:
+
+```bash title="run_lammps_eiger.sh"
+#!/bin/bash -l
+#SBATCH --job-name=<JOB_NAME>
+#SBATCH --time=01:00:00 (1)
+#SBATCH --nodes=2                   
+#SBATCH --ntasks-per-core=1                                                    
+#SBATCH --ntasks-per-node=32 (2)
+#SBATCH --cpus-per-task=4 (3) 
+#SBATCH --account=<ACCOUNT> (3)
+#SBATCH --hint=nomultithread
+#SBATCH --hint=exclusive
+#SBATCH --constraint=mc                                                  
+#SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
+#SBATCH --view=kokkos (5)
+
+ulimit -s unlimited
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj.in
+```
+1. Time format: `HH:MM:SS`.
+2. Number of MPI ranks per node.
+3. Number of threads per MPI rank.
+3. Change `<ACCOUNT>` to your project account name.
+4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+5. Enable the `kokkos` uenv view.
 
 ### Building LAMMPS from source
 
