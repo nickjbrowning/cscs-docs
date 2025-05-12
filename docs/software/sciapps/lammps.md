@@ -156,16 +156,16 @@ You may need to make the `wrapper.sh` script executable (`chmod +x wrapper.sh`).
 
 ### Running LAMMPS+GPU on the HPC Platform
 
-To start a job, two bash scripts are required: a [Slurm][ref-slurm] submission script, and a wrapper for `numactl` which sets up CPU and memory binding.
+To start a job, two bash scripts are required: a [Slurm][ref-slurm] submission script, and a wrapper for [CUDA MPS][ref-slurm-gh200-multi-rank-per-gpu].
 
 ```bash title="run_lammps_gpu.sh"
 #!/bin/bash -l
 #SBATCH --job-name=<JOB_NAME>
 #SBATCH --time=01:00:00 (1)
-#SBATCH --nodes=2                                                                        
-#SBATCH --ntasks-per-node=32 (2)
+#SBATCH --nodes=2 (2)                                                                        
+#SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:4
-#SBATCH --account=<ACCOUNT> (3)                                                                  
+#SBATCH --account=<ACCOUNT> (3)                                                       
 #SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
 #SBATCH --view=gpu (5)
 
@@ -179,52 +179,50 @@ srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
 
 1. Time format: `HH:MM:SS`.
-2. For LAMMPS+gpu its often beneficial to use more than 1 MPI rank per GPU.
+2. For LAMMPS+gpu it is often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided in the following section: [multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu].
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
-5. Load the `gpu` uenv view.
+5. Enable the `gpu` uenv view.
 
-#### LAMMPS + kokkos input file
+#### LAMMPS + GPU input file
+??? example "LAMMPS+GPU input file, defining a 3d Lennard-Jones melt."
+    ```
+    # 3d Lennard-Jones melt
+    variable        x index 200
+    variable        y index 200
+    variable        z index 200
+    variable        t index 1000
 
-Below is the input file used in the above script, defining a 3d Lennard-Jones melt.
+    variable        xx equal 1*$x
+    variable        yy equal 1*$y
+    variable        zz equal 1*$z
 
-```
-# 3d Lennard-Jones melt
-variable        x index 200
-variable        y index 200
-variable        z index 200
-variable        t index 1000
+    variable        interval equal $t/2
 
-variable        xx equal 1*$x
-variable        yy equal 1*$y
-variable        zz equal 1*$z
+    units           lj
+    atom_style      atomic
 
-variable        interval equal $t/2
+    lattice         fcc 0.8442
+    region          box block 0 ${xx} 0 ${yy} 0 ${zz}
+    create_box      1 box
+    create_atoms    1 box
+    mass            1 1.0
 
-units           lj
-atom_style      atomic
+    velocity        all create 1.44 87287 loop geom
 
-lattice         fcc 0.8442
-region          box block 0 ${xx} 0 ${yy} 0 ${zz}
-create_box      1 box
-create_atoms    1 box
-mass            1 1.0
+    pair_style      lj/cut 2.5
+    pair_coeff      1 1 1.0 1.0 2.5
 
-velocity        all create 1.44 87287 loop geom
+    neighbor        0.3 bin
+    neigh_modify    delay 0 every 20 check no
 
-pair_style      lj/cut 2.5
-pair_coeff      1 1 1.0 1.0 2.5
+    fix             1 all nve
 
-neighbor        0.3 bin
-neigh_modify    delay 0 every 20 check no
-
-fix             1 all nve
-
-thermo          ${interval}
-thermo_style custom step time  temp press pe ke etotal density
-run_style       verlet
-run             $t
-```
+    thermo          ${interval}
+    thermo_style custom step time  temp press pe ke etotal density
+    run_style       verlet
+    run             $t
+    ```
 
 ### Running on Eiger
 
@@ -283,8 +281,9 @@ Alternatively, the CMake variable `-DEXTERNAL_KOKKOS=yes` should force CMake to 
 
 #### Using LAMMPS uenv as an upstream Spack Instance
 
-If you'd like to extend the existing uenv with additional packages (or your own), you can use the provide LAMMPS uenv to provide all dependencies needed to build your customization. See https://eth-cscs.github.io/alps-uenv/uenv-compilation-spack/ for more information.
+If you'd like to extend the existing uenv with additional packages (or your own), you can use the LAMMPS uenv to provide all dependencies needed to build your customization. See [here](https://eth-cscs.github.io/alps-uenv/tutorial-spack) for more information.
 
+<!--
 First, set up an environment:
 
 ```
@@ -347,10 +346,7 @@ Installed packages:
 
 CG-SPICA GPU KSPACE MANYBODY MOLECULE PYTHON RIGID
 ```
-
-## Scaling
-
-!!! TODO !!!
+-->
 
 [LAMMPS]: https://www.lammps.org
 [GNU Public License]: http://www.gnu.org/copyleft/gpl.html
