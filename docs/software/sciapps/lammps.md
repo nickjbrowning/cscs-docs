@@ -176,13 +176,13 @@ ulimit -s unlimited
 srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 ```
 
-To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
-
 1. Time format: `HH:MM:SS`.
 2. For LAMMPS+gpu it is often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided in the following section: [multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu].
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 5. Enable the `gpu` uenv view.
+
+To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu]
 
 #### LAMMPS + GPU input file
 ??? example "LAMMPS+GPU input file, defining a 3d Lennard-Jones melt."
@@ -236,12 +236,12 @@ On Eiger, a similar sbatch script can be used:
 #SBATCH --ntasks-per-core=1                                                    
 #SBATCH --ntasks-per-node=32 (2)
 #SBATCH --cpus-per-task=4 (3) 
-#SBATCH --account=<ACCOUNT> (3)
+#SBATCH --account=<ACCOUNT> (4)
 #SBATCH --hint=nomultithread
 #SBATCH --hint=exclusive
 #SBATCH --constraint=mc                                                  
-#SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
-#SBATCH --view=kokkos (5)
+#SBATCH --uenv=<LAMMPS_UENV>:/user-environment (5)
+#SBATCH --view=kokkos (6)
 
 ulimit -s unlimited
 
@@ -249,12 +249,13 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj_kokkos.in
 ```
+
 1. Time format: `HH:MM:SS`.
 2. Number of MPI ranks per node.
 3. Number of threads per MPI rank.
-3. Change `<ACCOUNT>` to your project account name.
-4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
-5. Enable the `kokkos` uenv view.
+4. Change `<ACCOUNT>` to your project account name.
+5. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
+6. Enable the `kokkos` uenv view.
 
 ### Building LAMMPS from source
 
