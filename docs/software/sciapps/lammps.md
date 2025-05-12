@@ -247,7 +247,7 @@ ulimit -s unlimited
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj.in
+srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj_kokkos.in
 ```
 1. Time format: `HH:MM:SS`.
 2. Number of MPI ranks per node.
