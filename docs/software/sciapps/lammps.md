@@ -42,7 +42,8 @@ To start the uenv for this specific version of LAMMPS, you can use:
 uenv start --view kokkos lammps/2024:v2
 ```
 
-You can load the `view` from the uenv which contains the `lmp` executable. The executable in both these views support GPUs:
+You can load the `kokkos` or `gpu` view from the uenv to make the `lmp` executable available.
+The executable in both these views support GPUs:
 
 ```bash
 #lammps +kokkos package
