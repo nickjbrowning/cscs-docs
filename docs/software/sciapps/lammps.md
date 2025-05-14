@@ -13,7 +13,7 @@ The current version of LAMMPS is written in C++.
 ??? note "Licensing terms and conditions"
     [LAMMPS] is a freely-available open-source code, distributed under the terms of the [GNU Public License](http://www.gnu.org/copyleft/gpl.html).
 
-## Running  LAMMPS
+## Running LAMMPS
 
 ### Loading LAMMPS Interactively
 
