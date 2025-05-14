@@ -45,21 +45,29 @@ uenv start --view kokkos lammps/2024:v2
 You can load the `kokkos` or `gpu` view from the uenv to make the `lmp` executable available.
 The executable in both these views support GPUs:
 
-```bash
-#lammps +kokkos package
-uenv start --view kokkos lammps/2024:v2
-#lammps +gpu package, Kokkos disabled
-uenv start --view gpu lammps/2024:v2
-```
+=== "Kokkos"
+    ```bash
+    #lammps +kokkos package
+    uenv start --view kokkos lammps/2024:v2
+    ```
+=== "GPU"
+    ```bash
+    #lammps +gpu package
+    uenv start --view gpu lammps/2024:v2
+    ```
 
 A development view is also provided, which contains all libraries and command-line tools necessary to build LAMMPS from source, without including the LAMMPS executable:
 
-```bash
-# build environment for lammps +kokkos package, without providing lmp executable
-uenv start --view develop-kokkos lammps/2024:v2
-# build environment for lammps +gpu package, without providing lmp executable
-uenv start --view develop-gpu lammps/2024:v2
-```
+=== "Kokkos"
+    ```bash
+    # build environment for lammps +kokkos package, without providing lmp executable
+    uenv start --view develop-kokkos lammps/2024:v2
+    ```
+=== "GPU"
+    ```bash
+    # build environment for lammps +gpu package, without providing lmp executable
+    uenv start --view develop-gpu lammps/2024:v2
+    ```
 
 ### Running LAMMPS with Kokkos on the HPC Platform
 
@@ -281,12 +289,16 @@ mkdir /dev/shm/lammps_build; cd /dev/shm/lammps_build
 After you've obtained a version of LAMMPS you'd like to build, extract it in the above temporary folder and create a build directory. 
 Load one of the two following views:
 
-```
-#build environment for lammps +kokkos package, without providing lmp executable
-uenv start --view develop-kokkos lammps/2024:v2-rc1
-#build environment for lammps +gpu package, without providing lmp executable
-uenv start --view develop-gpu lammps/2024:v2-rc1
-```
+=== "Kokkos"
+    ```bash
+    #build environment for lammps +kokkos package, without providing lmp executable
+    uenv start --view develop-kokkos lammps/2024:v2
+    ```
+=== "GPU"
+    ```bash
+    #build environment for lammps +gpu package, without providing lmp executable
+    uenv start --view develop-gpu lammps/2024:v2
+    ```
 
 and now you can build your local copy of LAMMPS. 
 For example to build with Kokkos and the `MOLECULE` package enabled:
@@ -319,71 +331,6 @@ For LAMMPS to work correctly on our system, you need a LAMMPS version which prov
 #### Using LAMMPS uenv as an upstream Spack Instance
 
 If you'd like to extend the existing uenv with additional packages (or your own), you can use the LAMMPS uenv to provide all dependencies needed to build your customization. See [here](https://eth-cscs.github.io/alps-uenv/tutorial-spack) for more information.
-
-<!--
-First, set up an environment:
-
-```
-uenv start --view develop-gpu lammps/2024:v2
-
-git clone -b v0.23.0 https://github.com/spack/spack.git
-source spack/share/spack/setup-env.sh
-export SPACK_SYSTEM_CONFIG_PATH=/user-environment/config/
-```
-
-Then create the path and file `$SCRATCH/custom_env/spack.yaml`. We'll disable the KOKKOS package (and enable the GPU package via +cuda spec), and add the CG-SPICA package (via the +cg-spica spec) as an example. You can get the full list of options on [the LAMMPS spack package overview](https://packages.spack.io/package.html?name=lammps).
-
-```
-spack:
-  specs:
-  - lammps@20240417 ~kokkos +cuda cuda_arch=90 +python +extra-dump +cuda_mps +cg-spica
-  packages:
-    all:
-      prefer:
-        - +cuda cuda_arch=90
-    mpi:
-      require: cray-mpich +cuda
-  view: true
-  concretizer:
-    unify: true
-```
-
-Then concretize and build (note, you will of course be using a different path):
-
-```
-spack -e $SCRATCH/custom_env/ concretize -f
-spack -e $SCRATCH/custom_env/ install
-```
-
-During concretization, you'll notice a hash being printed alongside the LAMMPS package name. Take note of this hash. If you now try to load LAMMPS:
-
-```
-# naively try to load  LAMMPS 
-# it shows two versions installed (the one in the uenv, and the one we just built)
-spack load lammps
-==> Error: lammps matches multiple packages.
-  Matching packages:
-    rd2koe3 lammps@20240207.1%gcc@12.3.0 arch=linux-sles15-neoverse_v2
-    zoo2p63 lammps@20240207.1%gcc@12.3.0 arch=linux-sles15-neoverse_v2
-  Use a more specific spec (e.g., prepend '/' to the hash).
-# use the hash thats listed in the output of the build
-# and load using the hash
-spack load /zoo2p63
-# check the lmp executable:
-which lmp
-/capstor/scratch/cscs/browning/SD-61924/spack/opt/spack/linux-sles15-neoverse_v2/gcc-12.3.0/lammps-20240417-zoo2p63rzyuleogzn4a2h6yj7u3vhyy2/bin/lmp
-```
-
-You should now see that the CG-SPICA package in the list of installed packages:
-
-```
-> lmp -h
-...
-Installed packages:
-
-CG-SPICA GPU KSPACE MANYBODY MOLECULE PYTHON RIGID
-```
--->
 
 [LAMMPS]: https://www.lammps.org
 [GNU Public License]: http://www.gnu.org/copyleft/gpl.html
