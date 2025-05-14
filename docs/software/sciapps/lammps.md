@@ -181,7 +181,7 @@ srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 ```
 
 1. Time format: `HH:MM:SS`.
-2. For LAMMPS+gpu it is often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided in the following section: [multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu].
+2. For LAMMPS + GPU it is often beneficial to use more than 1 MPI rank per GPU. To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided in the following section: [multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu].
 3. Change `<ACCOUNT>` to your project account name.
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 5. Enable the `gpu` uenv view.
