@@ -115,9 +115,13 @@ sbatch run_lammps_kokkos.sh
 
 You may need to make the `wrapper.sh` script executable (`chmod +x wrapper.sh`).
 
-#### LAMMPS + Kokkos input file
 ??? example "LAMMPS + Kokkos input file, defining a 3d Lennard-Jones melt."
+
+    The following input file for LAMMPS + Kokkos defines a 3D Lennard-Jones system
+    melt.
+    
     ```
+
     variable        x index 200
     variable        y index 200
     variable        z index 200
