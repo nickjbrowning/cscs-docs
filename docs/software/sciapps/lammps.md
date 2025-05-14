@@ -187,9 +187,11 @@ srun ./mps-wrapper.sh lmp -sf gpu -pk gpu 4 -in lj.in
 5. Enable the `gpu` uenv view.
 
 To enable oversubscription of MPI ranks per GPU, you'll need to use the `mps-wrapper.sh` script provided at the following page: [NVIDIA GH200 GPU nodes: multiple ranks per GPU][ref-slurm-gh200-multi-rank-per-gpu].
+??? example "LAMMPS+GPU input file"
 
-#### LAMMPS + GPU input file
-??? example "LAMMPS+GPU input file, defining a 3d Lennard-Jones melt."
+    The following input file for LAMMPS + GPU defines a 3D Lennard-Jones system
+    melt.
+    
     ```
     # 3d Lennard-Jones melt
     variable        x index 200
