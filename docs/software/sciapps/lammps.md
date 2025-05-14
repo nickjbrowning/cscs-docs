@@ -9,7 +9,6 @@ The current version of LAMMPS is written in C++.
     [LAMMPS](https://www.lammps.org/) is provided on [ALPS][platforms-on-alps] via [uenv][ref-uenv].
     Please have a look at the [uenv documentation][ref-uenv] for more information about uenvs and how to use them.
 
-## Licensing Terms and Conditions
 
 ??? note "Licensing terms and conditions"
     [LAMMPS] is a freely-available open-source code, distributed under the terms of the [GNU Public License](http://www.gnu.org/copyleft/gpl.html).
