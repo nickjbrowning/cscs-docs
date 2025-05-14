@@ -17,7 +17,7 @@ The current version of LAMMPS is written in C++.
 
 ### Loading LAMMPS Interactively
 
-On Alps, LAMMPS is precompiled and available in a user environment [uenv]. 
+On Alps, LAMMPS is precompiled and available in a [uenv][ref-uenv]. 
 LAMMPS has been built with the [Kokkos](https://docs.lammps.org/Speed_kokkos.html) and GPU packages separately.
 
 To find which LAMMPS uenv is provided, you can use the following command:
