@@ -322,7 +322,7 @@ CC=mpicc CXX=mpic++ cmake \
 ../cmake  
 ```
 
-!!! `Warning`
+!!! warning
 
     If you are downloading LAMMPS from GitHub or their website and intend to use Kokkos for acceleration, there is an issue with Cray MPICH and `Kokkos <= 4.3`. 
 For LAMMPS to work correctly on our system, you need a LAMMPS version which provides `Kokkos >= 4.4`. 
