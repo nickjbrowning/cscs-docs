@@ -111,8 +111,6 @@ With the above script, you can launch a LAMMPS + Kokkos calculation on 2 nodes, 
 sbatch run_lammps_kokkos.sh
 ```
 
-You may need to make the `wrapper.sh` script executable (`chmod +x wrapper.sh`).
-
 ??? example "LAMMPS + Kokkos input file, defining a 3d Lennard-Jones melt."
 
     The following input file for LAMMPS + Kokkos defines a 3D Lennard-Jones system
