@@ -248,8 +248,10 @@ On Eiger, the following sbatch script can be used:
 ulimit -s unlimited
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OMP_PROC_BIND=spread
+export OMP_PLACES=threads
 
-srun --cpu-bind=socket lmp -k on t $OMP_NUM_THREADS -sf kk -in lj_kokkos.in
+srun --cpu-bind=cores lmp -k on t $OMP_NUM_THREADS -sf kk -in lj_kokkos.in
 ```
 
 1. Time format: `HH:MM:SS`.
