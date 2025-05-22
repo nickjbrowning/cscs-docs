@@ -81,7 +81,9 @@ The submission script is the following:
 #SBATCH --time=01:00:00 (1)
 #SBATCH --nodes=2                                                                        
 #SBATCH --ntasks-per-node=4  (2)
-#SBATCH --gres=gpu:4
+#SBATCH --gpus-per-node=4
+#SBATCH --gpus-per-task=1
+#SBATCH --gpu-bind=per_task:1
 #SBATCH --account=<ACCOUNT> (3)
 #SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
 #SBATCH --view=kokkos (5)
@@ -90,7 +92,7 @@ export MPICH_GPU_SUPPORT_ENABLED=1
  
 ulimit -s unlimited
  
-srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
+srun lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 ```
 
 1. Time format: `HH:MM:SS`.
@@ -99,23 +101,11 @@ srun ./wrapper.sh lmp -in lj_kokkos.in -k on g 1 -sf kk -pk kokkos gpu/aware on
 4. Change `<LAMMPS_UENV>` to the name (or path) of the LAMMPS uenv you want to use.
 5. Load the `kokkos` uenv view.
 
-the `numactl` wrapper is the following:
+!!! Note
+    Using `-k on g 1` specifies that we want 1 GPU per MPI-rank. 
+    This is contrary to what is mentioned in the official LAMMPS documentation, however this is required to achieve the propper configuration on Alps.
 
-```bash title="wrapper.sh"
-#!/bin/bash
-
-export LOCAL_RANK=$SLURM_LOCALID
-export GLOBAL_RANK=$SLURM_PROCID
-export GPUS=(0 1 2 3)
-export NUMA_NODE=$(echo "$LOCAL_RANK % 4" | bc)
-export CUDA_VISIBLE_DEVICES=${GPUS[$NUMA_NODE]}
-
-export MPICH_GPU_SUPPORT_ENABLED=1
- 
-numactl --cpunodebind=$NUMA_NODE --membind=$NUMA_NODE "$@"
-```
-
-With the above scripts, you can launch a LAMMPS + Kokkos calculation on 2 nodes, using 4 MPI ranks per node and 4 GPUs per node with:
+With the above script, you can launch a LAMMPS + Kokkos calculation on 2 nodes, using 4 MPI ranks and 1 GPU per MPI rank with:
 
 ```bash
 sbatch run_lammps_kokkos.sh
@@ -176,7 +166,7 @@ To start a job, two bash scripts are required: a [Slurm][ref-slurm] submission s
 #SBATCH --time=01:00:00 (1)
 #SBATCH --nodes=2 (2)                                                                        
 #SBATCH --ntasks-per-node=32
-#SBATCH --gres=gpu:4
+#SBATCH --gpus-per-node=4
 #SBATCH --account=<ACCOUNT> (3)                                                       
 #SBATCH --uenv=<LAMMPS_UENV>:/user-environment (4)
 #SBATCH --view=gpu (5)
