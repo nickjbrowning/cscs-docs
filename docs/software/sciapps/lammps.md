@@ -293,7 +293,7 @@ Load one of the two following views:
 and now you can build your local copy of LAMMPS. 
 For example to build with Kokkos and the `MOLECULE` package enabled:
 
-```
+```bash
 CC=mpicc CXX=mpic++ cmake \
 -DCMAKE_CXX_FLAGS=-DCUDA_PROXY \
 -DBUILD_MPI=yes\
