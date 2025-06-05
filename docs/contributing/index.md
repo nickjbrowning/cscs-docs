@@ -191,10 +191,9 @@ Once your changes are ready, click on the "Commit changes..." button in the top 
     See [the GitLab official guide on editing files](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files) for a step-by-step walkthrough.
 
 !!! note
-    You will need to keep the default option **Create a new branch for this commit and start a pull request**.
-
-    * if the change is small and you are CSCS staff, you can merge the PR immediately
-    * all other changes can be
+    Use the default option **Create a new branch for this commit and start a pull request**.
+    This allows others to review the change.
+    Even for trivial changes, opening a PR creates visibility that a small fix or change has been made.
 
 ## Style guide
 
