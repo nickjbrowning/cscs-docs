@@ -37,7 +37,7 @@ There are three main file systems mounted on the MLP clusters Clariden and Brist
 | -- | -- | -- |
 | Home | `/users/$USER` | [VAST][ref-alps-vast] |
 | Scratch | `/iopsstor/scratch/cscs/$USER` | [Iopsstor][ref-alps-iopsstor] |
-|         | `/iopsstor/scratch/cscs/$USER` | [Capstor][ref-alps-iopsstor] |
+|         | `/capstor/scratch/cscs/$USER` | [Capstor][ref-alps-iopsstor] |
 | Project | `/capstor/store/cscs/swissai/<project>` | [Capstor][ref-alps-capstor] |
 
 ### Home
