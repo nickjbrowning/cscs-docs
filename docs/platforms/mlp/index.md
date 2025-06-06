@@ -66,10 +66,12 @@ Scratch is per user - each user gets separate scratch path and quota.
 ### Scratch Usage Recommendations
 
 Use Iopstor scratch (`$SCRATCH`) for:
+
 * Training and validation datasets that are read frequently and non-sequentially.
 * Workloads that perform many small, random I/O operations.
 
 Use Capstor scratch (`/capstor/scratch/cscs/$USER`) for:
+
 * Storing model checkpoints.
 * Outputs from simulations or training jobs that involve large, contiguous I/O.
 
