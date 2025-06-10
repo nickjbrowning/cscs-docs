@@ -11,6 +11,18 @@ There are two ways to set up the connection:
 The main challenge with using VSCode is that the most convenient method for starting a remote session is to start a remote tunnel from the VS Code GUI.
 This approach starts a session in the standard login environment on that node, however this won't work if you want to be developing in a container, in a uenv, or on a compute node.
 
+This process is also demonstrated in a webinar on [Interactive computing on "Alps"](https://www.cscs.ch/publications/tutorials/2025/video-of-the-webinar-interactive-computing-on-alps):
+
+<iframe width="100%"
+        height="315"
+        src="https://www.youtube.com/embed/cLVpJO_fE6I?si=bTmmsS_9QvTHpUqK&amp;start=2257"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+</iframe>
+
 ## Flexible method: remote server
 
 The most flexible method for connecting VSCode is to log in to the Alps system, set up your environment (start a container or uenv, start a session on a compute node), and start the remote server in that environment pre-configured.
@@ -112,11 +124,6 @@ Once the tunnel is configured, you can access it from VSCode.
     If you plan to do any intensive work: repeated compilation of large projects or running python code in Jupyter, please see the guide to running on a compute node below.
     Running intensive workloads on login nodes, which are shared resources between all users, is against CSCS [fair usage][ref-policies-fair-use] of Shared Resources policy.
 
-### Using with containers
-
-!!! todo
-    write a guide
-
 ### Running on a compute node
 
 If you plan to do computation using your VSCode, then you should first allocate resources on a compute node and set up your environment there.
@@ -158,10 +165,38 @@ If you plan to do computation using your VSCode, then you should first allocate 
     * `-n1` requests a single rank - only one rank/process is required for VSCode
     * `--pty` allows forwarding of terminal I/O, for bash to work interactively
 
+### Using with containers
+
+This will use CSCS's **[Container Engine][ref-container-engine]**.
+Using this workflow, one can pull a container from a registry like DockerHub.
+Note that this process also requires that you have a GitHub account, with an authentication and authorization step as described earlier.
+
+This will also use the Remote Tunnel extension and the VS Code connected to the GitHub account (see above).
+
+```toml title="EDF file with image and mount paths"
+image = "nvcr.io#nvidia/pytorch:24.01-py3" # example of PyTorch NGC image
+writable = true
+mounts = ["/paths/on/scratch/or/home:path/on/the/container",
+          "/path/if/same/on/both"
+          "/path/of/code/executable:/path/for/code/executable/in/container"]
+workdir = "default/working/dir/path"
+```
+
+!!! note
+    Ensure that the `code` executable is accessible in the container.
+    It can either be contained in the image, or in one of the mounted folders.
+
+```bash title="Launch container and tunnel"
+# launch container on compute node
+srun -N 1 --environment=/absolute/path/to/tomlfile.toml --pty bash
+
+start tunnel
+
+cd path/for/code/executable/in/container
+./code tunnel --name=$CLUSTER_NAME-tunnel
+```
+
 ## Connecting via VSCode UI
 
 !!! warning
     This approach is not recommended, because while it may be easier to connect via the VS Code UI, it is much more difficult to configure the connection so that you can use uenv, containers or compute nodes.
-
-!!! todo
-    Write the guide
